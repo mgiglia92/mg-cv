@@ -92,11 +92,11 @@ To model the 12V DC motor I decided to do a typical step input test to get a fir
 
 #### Total Inertia
 To get the total inertia of the system I wrapped some thread around the **Reaction Mass** portion, mounted the system so that its rotation would be parallel to the gravitational field. This prevented oscillations in the data collection from an unbalanced system which remember was done on purpose to simulate "gravity drag". Then a small weight was added to the end of the thread and hung over a smooth surface to minimize friction as well as change the direction of the thread so that gravity can pull on the weight. I then measured the angular velocity over time until the weight hit the ground. By taking the derivative of the angular velocity I can get an approximation of the angular acceleration applied to the whole system. Then since I know the applied torque (weight at the end of the thread and the radius it was applied) I can back out the total inertia of the system. This is not completely true as I do need to remove the friction due to the slip ring which is discussed later, but by "feed forwarding" the acceleration due to the slip ring back into the data I was able to remove the frictonal effects and get the total inertia of the system. Which along with some manual calculations using the values from CAD as well as my own measurements was within what I considered reasonable for the testing seup I had available.  
-<img src="images/setups/total-inertia-setup.jpg" width="200" />
+<img src="images/setups/total-inertia-setup.jpg" width="500" />
 
 #### Inertia ratio
 Calculating the inertia ratio was much more difficult and it took me some time to come up with a good way to estimate this. At first I thought maybe I would be able to separate out the **Reaction Mass** and the **Sattelite** and do the same total inertia test on each one individually. This would not be a feasible solution though as the 12V DC motor inherently has elements part of each of these subsystems. So instead I decided to use the motor itself to spin up the **Reaction Mass** and subsequently the **Sattelite**. From here I would be able to use the encoder reading to get the angular velocity of the reaction wheel (and the motor stator knowing the gearbox ratio) that is in the **Sattelite**'s frame (this is very important). And then I would be able to use the IMU (MPU6050) to get the angular velocity of the **Sattelite** in the global frame. From here I would be able to use the angular velocity ratio to get an "effective inertia ratio". I call it an effective inertia ratio because some elements of the **Reaction Mass** spin at different rates. Unfortunately the friction due to the slip ring made this analysis not as straight forward. In post analysis I again needed to apply an acceleration to the data to remove the frictional effects. Once that was done the angular velocity ratio would then be used to get the effective inertia ratio. That combined with knowing the total inertia would provide me with the inertias of each of the subsystems.  
-<img src="images/notes/inertia-ratio-notes.jpg" width="500" data-rotate="90"/>
+<img src="images/notes/inertia-ratio-notes.jpg" width="500"/>
 <img src="images/notes/inertia-ratio-notes-2.jpg" width="1000" />
 
 
@@ -110,15 +110,15 @@ To do this a simulink model for the entire system was created to help in the tun
 Sattelite Simulation  
 <img src="images/satsim.png" />
 Motor Model  
-<img src="images/motor.png" />
-Torque Conversion  
+    <img src="images/motor.png" />
+    Torque Conversion  
 <img src="images/torqueconversion.png" />
 
 #### Inner Loop tuning
 First, I tuned the **Reaction Mass** Actuator PID controller and tested that out on the system with the **Sattelite** portion of the system fixed, preventing rotation. The auto tune quality was tuned less so for robustness and more for quick reference tracking. This was done since this is the INNER loop of a cascade loop and it is important that the inner loop reaches steady state quickly as to look like a "constant" to the outer loop. In industry it is my understanding that the INNER loop should have a bandwidth of approximately one order of magnitude greater than the outer loop to prevent inner loop dynamics from causing instability in the OUTER loop(s). So, the faster the INNER loop can reach steady state, the faster or more agressive my OUTER loop can be.
 
 #### Outer Loop tuning
-Now that the angular velocity control on the **Reaction Mass** is tuned I can move on to tuning the attitude control of the **Sattelite** portion of the system. First a mathematical model for conservation of angular momentum is added to simulink to properly represent how the system 
+Now that the angular velocity control on the **Reaction Mass** is tuned I can move on to tuning the attitude control of the **Sattelite** portion of the system. First a mathematical model for conservation of angular momentum is added to simulink to properly represent how the system TODOTODO
 
 #### Reflection and Analysis
 
