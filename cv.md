@@ -104,25 +104,40 @@ Calculating the inertia ratio was much more difficult and it took me some time t
 To calculate slip ring friction I simply spin up the entire system by hand and record data as the system slows to a stop. From here I can determine the acceleration due to friction and use this estimate to "remove" frictional effects from the data for other system identification methods. The frictional effects were quite constant over the different angular velocities which was nice. Though not 100% constant, for the time and material constraints this was sufficient! This was also added to my simulink model as a "coloumb friction" block.
 
 ### MATLAB/Simulink Model
-One of the goals of this project was to go through the steps to tune this system as if I was being done for an industrial purpose and not just for fun/education. 
-To do this a simulink model for the entire system was created to help in the tuning process to get some initial gains "ballparked". To make the model realistic each subsystem was individually modelled, the slip-ring's friction was added as well. From here I would then leverage the "auto-tune" capabilities of MATLAB to tune each subsystem. 
+The controller topology is a Cascaded with 3 loops. From the inner most to outer most loop the names I will use are **Wheel Velocity Control**, **Sattelite Angular Velocity**, **Sattelite Attitude**, respectively. The intuition is as follows. The **Sattelite Attitude** loop outputs a desired angular velocity which is then used to get an angular velocity error which is fed into the **Sattelite Angular Velocity** loop. The **Sattelite Angular Velocity** loop then outputs a desired torque. This is fed through a simple mathematical model using the Reaction Wheel's current angular velocity and known inertias to output a desired wheel angular velocity (this can be thought of as a Feed Forward model). This creates a wheel angular velocity error which feeds the **Wheel Velocity Control** loop. This control loop outputs a voltage that will spin up/down the Reaction Wheel and generate torque on the Sattelite.
+
+This is all that needs to be implemented on the micro-processor to get a controller (this logic is embedded in lines [Feedback Logic](https://github.com/mgiglia92/reaction-wheel/blob/36567f2caa8b0d2192c346621a4ef0073b126154/src/arduino/full_app/full_app.ino#L74C7-L105C6)). But for the Simulink model I also must model external forces and the motor itself. The first order motor model is embedded in the **Motor Model** block which also contains the feedback control for the **Wheel Velocity Control** loop. As well, the Friction and applied torque to the sattelite must be modelled explicitly in Simulink.
+
+The purple section in the Simulink model houses these explicity physical first principles. The input signal into this section of the model is the angular velocity of the wheel. The derivative of this is taken to get an angular acceleration at the wheel. It is passed though a gain block to convert it into the acceleration applied to the sattelite with conservation of angular momentum. Then the friction model's angular acceleration is also added to the sattelite's total angular acceleration. This is the integrated twice to get the angular velocity and attuitde of the sattelite. These signals are fedback where necessary.
+
+For the following data I have removed the slip-ring friction model as it's effects are unintuitive just looking at data on graphs.
+![no friction sim](images/data/sattelite-sim-data.png)  
+![no friction sim](images/data/reaction-wheel-sim-data.png)  
+As you can see the reaction wheel spins up briefly to increase the angular velocity of the sattelite and then slowly spins back down as the sattelite approaches its setpoint. There is a bit of angular velocity left on the reaction wheel in the simulation and I believe this is due to some numerical integration drift as this is a discrete time simulation. 
+
+Unfortunately I have not saved data from the system to compare the simulation transient response to the real system, but by looking at the video we can see that the transient response is very much similar to the simulation data. As well in the video we can see the system's robustness to significant disturbances that would be unlikely seen in an application such as a sattelite attitude control system. The "jitting" seen here is due to the backlash in the gearbox of the reaction wheel's dc motor. If a direct drive system was setup this "jittering" would most likely disappear. In the case it did not, that may mean one of the inner loops has too high of a proportional gain and should be lowered to prevent oscillations due to the controller. 
+
+If you wish to see an analysis of the feedback controllers real response vs simulated response I can do that but just may need some time to get my hands on the device. It's currently not in my posession.
+
+In the following video two things can be seen. Static reference tracking with a manual disturbance input (via my finger). During this time you can see the reaction wheel saturate then get desaturated by the propeller which is using a simple hysteresis control once the reaction wheel reaches 70% of its maximum angular velocity. In the second part you can see the sattelite tracking a sine wave and similarly the reaction wheel saturating/desaturating.
+
+Reaction Wheel Video  
+
+<video width="320" height="240" controls>
+  <source src="rxwheel.mp4" type="video/mp4">
+</video>
 
 Sattelite Simulation  
 <img src="images/satsim.png" />
 Motor Model  
-    <img src="images/motor.png" />
-    Torque Conversion  
+<img src="images/motor.png" />
+Torque Conversion  
 <img src="images/torqueconversion.png" />
 
-#### Inner Loop tuning
-First, I tuned the **Reaction Mass** Actuator PID controller and tested that out on the system with the **Sattelite** portion of the system fixed, preventing rotation. The auto tune quality was tuned less so for robustness and more for quick reference tracking. This was done since this is the INNER loop of a cascade loop and it is important that the inner loop reaches steady state quickly as to look like a "constant" to the outer loop. In industry it is my understanding that the INNER loop should have a bandwidth of approximately one order of magnitude greater than the outer loop to prevent inner loop dynamics from causing instability in the OUTER loop(s). So, the faster the INNER loop can reach steady state, the faster or more agressive my OUTER loop can be.
 
-#### Outer Loop tuning
-Now that the angular velocity control on the **Reaction Mass** is tuned I can move on to tuning the attitude control of the **Sattelite** portion of the system. First a mathematical model for conservation of angular momentum is added to simulink to properly represent how the system TODOTODO
-
-#### Reflection and Analysis
-
-# *Optimal Control / Trajectory Generation and Differential Geometry*
+# COMING SOON  
+```
+# *Optimal Control / Trajectory Generation and Differential Geometry for a combined Land & Aerial Vehicle*
 
 # *"Carrie" Ackerman Steering Robot*
 
@@ -132,3 +147,4 @@ Now that the angular velocity control on the **Reaction Mass** is tuned I can mo
 ## Ball-Beam Balancing
 ## Experimentation Lab
 ## Crazyflie Gimbal
+```
