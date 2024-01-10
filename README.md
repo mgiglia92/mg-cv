@@ -109,8 +109,9 @@ This is all that needs to be implemented on the micro-processor to get a control
 The purple section in the Simulink model houses these explicitly physical first principles. The input signal into this section of the model is the angular velocity of the wheel. The derivative of this is taken to get an angular acceleration at the wheel. It is passed though a gain block to convert it into the acceleration applied to the satellite with conservation of angular momentum. Then the friction model's angular acceleration is also added to the satellite's total angular acceleration. This is the integrated twice to get the angular velocity and attuitde of the satellite. These signals are fed-back where necessary.
 
 For the following data I have removed the slip-ring friction model.
-![no friction sim](images/data/sattelite-sim-data.png)  
-![no friction sim](images/data/reaction-wheel-sim-data.png)  
+<img src="images/data/sattelite-sim-data.png" width="500">
+<img src="images/data/reaction-wheel-sim-data.png" width="500">
+
 As you can see the reaction wheel spins up briefly to increase the angular velocity of the satellite and then slowly spins back down as the sattelite approaches its setpoint. There is a bit of angular velocity left on the reaction wheel once the sattelite reaches it's desired setpoint in the simulation and I believe this is due to some numerical integration/derivative drift as my time step is 10ms.
 
 Unfortunately I have not saved data from the system to compare the simulation transient response to the real system, but by looking at the video we can see that the transient response is very much similar to the simulation data. As well in the video we can see the system's robustness to significant disturbances that would be unlikely seen in an application such as a satellite attitude control system. The "jittering" seen here is due to the backlash in the gearbox of the reaction wheel's dc motor. If a direct drive system was setup this "jittering" would most likely disappear. In the case it did not, that may mean one of the inner loops has too high of a proportional gain and should be lowered to prevent oscillations due to the controller. 
