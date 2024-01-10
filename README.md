@@ -108,9 +108,9 @@ This is all that needs to be implemented on the micro-processor to get a control
 
 The purple section in the Simulink model houses these explicitly physical first principles. The input signal into this section of the model is the angular velocity of the wheel. The derivative of this is taken to get an angular acceleration at the wheel. It is passed though a gain block to convert it into the acceleration applied to the satellite with conservation of angular momentum. Then the friction model's angular acceleration is also added to the satellite's total angular acceleration. This is the integrated twice to get the angular velocity and attuitde of the satellite. These signals are fed-back where necessary.
 
-For the following data I have removed the slip-ring friction model.
-<img src="images/data/sattelite-sim-data.png" width="500">
-<img src="images/data/reaction-wheel-sim-data.png" width="500">
+For the following data I have removed the slip-ring friction model.  
+<img src="images/data/sattelite-sim-data.png" width="500">  
+<img src="images/data/reaction-wheel-sim-data.png" width="500">  
 
 As you can see the reaction wheel spins up briefly to increase the angular velocity of the satellite and then slowly spins back down as the sattelite approaches its setpoint. There is a bit of angular velocity left on the reaction wheel once the sattelite reaches it's desired setpoint in the simulation and I believe this is due to some numerical integration/derivative drift as my time step is 10ms.
 
@@ -178,7 +178,7 @@ Post collision trajectory is an important element of this system. Can the set of
 How can this be 
 
 # *CU@HOME*  
-CU@HOME was made in response to the COVID-19 pandemic as the school needed to shift to remote learning. Here's a write up Cooper did about it [CU@HOME].  
+CU@HOME was made in response to the COVID-19 pandemic as the school needed to shift to remote learning. Here's a write up Cooper did about it [CU@HOME]. The following are just some images of the devices built and produced in under six months. During this time I also managed some student software developers to make Graphical User Interfaces, Communications Protocols and other necessary tools to make the kits useful for hands-on engineering education. I will be adding details to these in the future.  
 
 ## DC Motor / Controls Lab / Drone Controls Lab  
 <img src="images/dc-motor-lab.png" />   
@@ -187,16 +187,8 @@ CU@HOME was made in response to the COVID-19 pandemic as the school needed to sh
 
 <img src="images/drone-control-back-iso.jpg" width="500" />  
 
-## Ball-Beam Balancing
-
-## Experimentation Lab
-
 ## Crazyflie Gimbal
 <img src="images/drone-gimbal-iso.jpg" width="500" />   
-
-# *"Carrie" Ackerman Steering Robot*
-
-
 
 [CU@HOME]:<https://cooper.edu/engineering/news/unpacking-cuhome-engineering-kits>
 [Drone Attitude Control]:<https://www.diva-portal.org/smash/get/diva2:1010947/FULLTEXT01.pdf>
